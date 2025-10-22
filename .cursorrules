@@ -227,3 +227,173 @@ Implementation of a dedicated Admin Management System separate from User managem
 - Bulk admin operations
 - Admin permissions system
 - Two-factor authentication
+
+---
+
+# PHASE 2: USER MANAGEMENT SYSTEM - PRD
+
+## Overview
+Implementation of a comprehensive User Management System that allows Admins to create, manage, and control regular users in the CRMNOW system. This phase focuses on user lifecycle management with admin-controlled user creation and management.
+
+## Technical Architecture
+
+### Database Schema
+- **Users Table**: Enhanced existing users table
+  - id (Primary Key)
+  - name (Required)
+  - email (Required, Unique)
+  - password (Required, Hashed)
+  - role (Enum: 'admin', 'user', Default: 'user')
+  - is_active (Boolean, Default: true)
+  - created_at, updated_at
+
+### Models & Relationships
+- **User Model**: Enhanced existing User model with FilamentUser interface
+- **UserResource**: Filament resource for user CRUD operations
+- **User Authentication**: Separate authentication system for users
+- **Admin-User Relationship**: Admins can manage users
+
+## Feature Specifications
+
+### 1. User Creation (Add User) - Admin Only
+**Form Fields:**
+- Name: Required, Text Input
+- Email: Required, Email Input, Unique Validation
+- Password: Required, Password Input with Show/Hide Eye Icon, Min 8 characters
+- Confirm Password: Required, Password Confirmation with Show/Hide Eye Icon
+- Active Status: Toggle (Default: Active)
+
+**Business Rules:**
+- Email must be unique across all users
+- Password must be minimum 8 characters
+- User is created with `role = 'user'` by default
+- User is created with `is_active = true` by default
+- Automatic email validation for format
+- **Auto-redirect to User List after creation**
+
+### 2. User Management (Edit User) - Admin Only
+**Editable Fields:**
+- Name: Can be modified
+- Email: **READ-ONLY** (Cannot be changed after creation)
+- Password: **READ-ONLY** (Cannot be changed via edit form)
+- Status: Toggle between Active/Inactive
+
+**Business Rules:**
+- Email field is disabled in edit mode with helper text
+- Password fields are hidden in edit mode with informative placeholder
+- Only name field and status can be modified
+- Status change triggers immediate effect
+- **Auto-redirect to User List after saving**
+
+### 3. User Status Management (Enable/Disable) - Admin Only
+**Status Options:**
+- Active: User can login and access user panel
+- Inactive: User cannot login, shows "You are disabled" message
+
+**Implementation:**
+- Toggle switch in user list/edit forms
+- Middleware check for `is_active` status during login
+- Custom error message for disabled users
+- Confirmation dialogs for status changes
+
+### 4. User List & Management - Admin Only
+**Table Columns:**
+- ID (Sortable)
+- Name (Searchable)
+- Email (Searchable)
+- Status (Active/Inactive with visual indicators)
+- Created Date (Sortable)
+- Actions (Edit, Toggle Status)
+
+**Features:**
+- Search by name or email
+- Filter by status (Active/Inactive/All)
+- Sort by creation date (default: newest first)
+- **No Delete Action** (as per requirements)
+
+## Security & Validation
+
+### Authentication Rules
+- Disabled users cannot login
+- Custom error message: "Your account has been disabled. Please contact system administrator."
+- Session invalidation for disabled users
+- Password hashing using Laravel's bcrypt
+- Role-based access control (Admin vs User)
+
+### Data Validation
+- Email format validation
+- Unique email constraint
+- Password strength requirements (min 8 characters)
+- Required field validation
+- XSS protection on all inputs
+- Password confirmation validation
+
+## UI/UX Specifications
+
+### User Resource Pages
+- **List Page**: Table view with search, filters, and actions
+- **Create Page**: Minimalist form with essential fields only
+- **Edit Page**: Read-only email field, editable name field, password placeholder
+- **Status Toggle**: Prominent toggle switch with confirmation dialogs
+
+### Visual Design
+- Consistent with existing Filament theme (Blue primary color for User panel)
+- Clear status indicators (Green checkmark for Active, Red X for Inactive)
+- Minimalist form layouts (simpler than Admin forms)
+- Responsive design for all screen sizes
+- **Password Show/Hide Eye Icons** for better UX
+
+## Implementation Phases
+
+### Phase 2A: Enhanced User Model & Migration
+- Enhance existing User model with additional fields
+- Create migration for user table enhancements
+- Set up model relationships and validation
+- Ensure FilamentUser interface compatibility
+
+### Phase 2B: Filament User Resource
+- Create UserResource with CRUD operations
+- Implement minimalist form validation
+- Add table columns and filters
+- Implement no-delete policy
+
+### Phase 2C: Authentication Integration
+- Ensure user authentication works with enhanced model
+- Implement status-based login restrictions
+- Add custom error messages for disabled users
+- Configure user guards and providers
+
+### Phase 2D: UI Enhancement & Testing
+- Polish UI components with minimalist design
+- Add confirmation dialogs for status changes
+- Implement auto-redirect after create/edit
+- Comprehensive testing of all user features
+
+## Success Criteria
+- ✅ Admins can create users with proper validation
+- ✅ User editing works with read-only email/password
+- ✅ Status toggle immediately affects login ability
+- ✅ Disabled users see appropriate error message
+- ✅ All CRUD operations work seamlessly (except delete)
+- ✅ UI is minimalist and user-friendly
+- ✅ **Password show/hide eye icons working**
+- ✅ **Auto-redirect after create/edit**
+- ✅ **No delete functionality implemented**
+- ✅ **Form auto-population in edit mode**
+
+## Additional Features Implemented
+- **Password Show/Hide Eye Icons**: Enhanced UX for password fields
+- **Auto-Redirect**: After create/edit, redirects to user list
+- **No Delete Policy**: Users cannot be deleted, only disabled
+- **Minimalist Forms**: Simplified user creation forms
+- **Enhanced Error Handling**: Proper FilamentUser interface implementation
+- **Professional UI**: Clean, minimalist design
+
+## Future Enhancements (Not in Phase 2)
+- User profile management
+- User activity logging
+- Password reset functionality
+- Bulk user operations
+- User permissions system
+- User role hierarchy
+- User dashboard customization

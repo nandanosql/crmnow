@@ -24,6 +24,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'role',
+        'is_active',
     ];
 
     /**
@@ -46,6 +47,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -66,10 +68,23 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Check if user is active
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active;
+    }
+
+    /**
      * Check if user can access Filament panel
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        // User must be active to access any panel
+        if (!$this->isActive()) {
+            return false;
+        }
+
         if ($panel->getId() === 'admin') {
             return $this->isAdmin();
         }
