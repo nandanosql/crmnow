@@ -23,9 +23,10 @@ class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        // Disable Filament user panel - using custom frontend instead
         return $panel
             ->id('user')
-            ->path('user')
+            ->path('user-filament') // Different path to avoid conflicts
             ->login(Login::class)
             ->brandName('CRMNOW')
             ->colors([
